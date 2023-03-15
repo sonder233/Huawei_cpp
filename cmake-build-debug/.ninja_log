@@ -1,0 +1,9 @@
+# ninja log v5
+8	3648	7004979212387989	CMakeFiles/Huawei_exam.dir/main.cpp.obj	d910f2e8eef2ff8a
+0	413	7005078799972357	build.ninja	34b258465652f767
+3649	4756	7004979223455224	Huawei_exam.exe	cb17f1d17e4786c8
+67	740	7000515660521158	CMakeFiles/Huawei_exam.dir/dp.cpp.obj	d85f67a0bf896684
+43	1290	7005079449555023	CMakeFiles/Huawei_exam.dir/test.cpp.obj	89b3a9c39306853a
+34	3116	7005079467786666	CMakeFiles/Huawei_exam.dir/main.cpp.obj	d910f2e8eef2ff8a
+4	2430	7005079852273216	CMakeFiles/Huawei_exam.dir/main.cpp.obj	d910f2e8eef2ff8a
+2431	3288	7005079860869275	Huawei_exam.exe	1dde7581fe6bd511
