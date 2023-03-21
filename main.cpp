@@ -9,6 +9,7 @@
 #include <iomanip>
 #include<time.h>
 #include <cmath>
+#include <queue>
 
 using namespace std;
 
@@ -1434,11 +1435,541 @@ public:
 
 };
 
+void HJ37(){
+    int n = 7;
+    int rabbit_two = 1;
+    int rabbit_one = 0;
+    int rabbit_old = 0;
+    for (int i = 0; i < n-1; ++i) {
+        int temp = rabbit_two;
+        if (rabbit_old > 0){
+            rabbit_two += rabbit_old;
+        }
+        if (rabbit_one>0){
+            rabbit_old += rabbit_one;
+            rabbit_two += rabbit_one;
+            rabbit_one = 0;
+        }
+        if (temp > 0){
+            rabbit_two -= temp;
+            rabbit_one += temp;
+        }
+    }
+    cout<<rabbit_one+rabbit_two+rabbit_old<<endl;
+
+}
+
 void HJ48(){
 
 }
+void HJ50(){
+
+}
+
+bool contain_7(int number){
+    string str =  to_string(number);
+    for (int i = 0; i < str.size(); ++i) {
+        if (str[i] == '7'){
+            return true;
+        }
+    }
+    return false;
+}
+
+void HJ55(){
+    int n = 198;
+    int sum = 0;
+    for (int i = 1; i <= n; ++i) {
+        if ( i%7 == 0 || contain_7(i)){
+            sum++;
+        }
+    }
+    cout<<sum<<endl;
+}
+
+string plus_str(string num_1,string num_2){
+    string result = "";
+    reverse(num_1.begin(),num_1.end());
+    reverse(num_2.begin(),num_2.end());
+    int m = 0;
+    int i = 0,j = 0;
+    for (; i < num_1.size(),j < num_2.size(); ++i,++j) {
+        int a = num_1[i] - '0';
+        int b = num_2[j] - '0';
+        if (a+b+m>9){
+            m = 1;
+        }
+        result += to_string((a+b+m)%10);
+    }
+}
+
+void HJ57(){
+    string num_1 = "58797810";
+    string num_2 = "80834732";
+
+    if (num_2.length()>num_1.length()){
+        swap(num_1,num_2);
+    }
+    string result = "";
+    reverse(num_1.begin(),num_1.end());
+    reverse(num_2.begin(),num_2.end());
+    int m = 0;
+    int i = 0,j = 0;
+    for (; i < num_1.size(),j < num_2.size(); ++i,++j) {
+        int a = num_1[i] - '0';
+        int b = num_2[j] - '0';
+        string tail = "";
+        if ( j == num_1.length()-1 && a+b+m >9){
+            tail =to_string(a+b+m);
+            reverse(tail.begin(),tail.end());
+            result += tail;
+        }else{
+            result += to_string((a+b+m)%10);
+        }
+        if (a+b+m>9){
+            m = 1;
+        }else{
+            m = 0;
+        }
+    }
+    if (m == 1){
+        for (int k = i; k < num_1.length(); ++k){
+            int c = num_1[k] - '0';
+            if (k == num_1.length()-1 && c+m >9){
+                string tail =to_string(c+m);
+                reverse(tail.begin(),tail.end());
+                result += tail;
+            }else{
+                result += to_string((c+m)%10);
+            }
+            if (c + m > 9){
+                m = 1;
+            }else{
+                m = 0;
+            }
+
+        }
+    }else{
+        result += num_1.substr(i,num_1.size());
+    }
+    reverse(result.begin(),result.end());
+    cout<<result<<endl;
+
+}
+
+void HJ59(){
+    string str = "asdfasdfo";
+    bool b = false;
+    for (int i = 0; i < str.size(); ++i) {
+        if (std::count(str.begin(), str.end(),str[i])==1){
+            cout<<str[i]<<endl;
+            b = true;
+            break;
+        }
+    }
+    if (!b){
+        cout<<-1<<endl;
+    }
+}
+
+void HJ63(){
+    string dna = "AACTGTGCACGACCTGA";
+    int n = 5;
+    int sum = 0;
+    string result = "";
+    for (int i = 0; i < dna.length()-n+1; i++) {
+        string temp = dna.substr(i,5);
+        int m = 0;
+        for (int j = 0; j < temp.size(); ++j) {
+            if (temp[j] == 'C' || temp[j] == 'G'){
+                m++;
+            }
+        }
+        if (m>sum){
+            sum = m;
+            result = temp;
+        }
+    }
+    cout<<result<<endl;
+}
+void HJ64(){
+    int n = 2;
+    string order = "DUDUDDUUDUDDDDUDUDDDUUDDUDDUDUDUDDDUDUDUUDDUUDDUUUDUDUUUDDUDUDDUUDUDDDDUDUDUUDUDDDDDUU";
+    int index = 1;
+    int left = 1;
+    int right = 4;
+    if (n <= 4){
+        right = n;
+        for (int i = 0; i < order.length(); ++i) {
+            if (order[i] == 'U'){
+                if (index == 1){
+                    index = n;
+                }else{
+                    index--;
+                }
+            }else{
+                if (index == n){
+                    index = 1;
+                }else{
+                    index++;
+                }
+            }
+        }
+    }else{
+        for (int i = 0; i < order.length(); ++i) {
+            if (left < index && index < right){
+                if (order[i] == 'U') index--;
+                else index++;
+            }else if(index == left && order[i] == 'D') {
+                index++;
+            }else if(index == right && order[i] == 'U'){
+                index--;
+            }else{
+                if (order[i] == 'U' && index == 1){
+                    index = n;
+                    left = n -3;
+                    right = n;
+                }else if (order[i] == 'D' && index == n){
+                    index = 1;
+                    left = 1;
+                    right = 4;
+                }else if (order[i] == 'U'){
+                    left--;
+                    right--;
+                    index--;
+                }else if (order[i] == 'D'){
+                    left++;
+                    right++;
+                    index++;
+                }
+            }
+
+        }
+    }
+    for (int i = left; i <= right; ++i) {
+        cout<<i<<" ";
+    }
+    cout<<endl;
+    cout<<index<<endl;
+
+}
+
+void HJ65(){
+    string str_1 = "abcdefghijklmnop";
+    string str_2 = "abcsafjklmnopqrstuvw";
+    string sub = "";
+    for (int i = 0; i < str_1.size(); ++i) {
+        int index = str_2.find_first_of(str_2[i]);
+        cout<<index;
+    }
+}
+bool isSame_ad(char a,char b){
+    if (isdigit(a) && isdigit(b)){
+        return a == b;
+    }else if (isalpha(a) && isalpha(b)){
+        return ::tolower(a) == ::tolower(b);
+    }else{
+        return false;
+    }
+}
+void HJ71(){
+    string s_1 = "h*h*ah**ha*h**h***hha";
+    string s_2 = "hhhhhhhahhaahhahhhhaaahhahhahaaahhahahhhahhhahaaahaah";
+    int i = 0;
+    int j = 0;
+    string r = "true";
+
+    while (i < s_1.size() && j < s_2.size()){
+        char c_1 = s_1[i];
+        char c_2 = s_2[j];
+        if (isSame_ad(s_1[i] , s_2[j])){
+            i++;
+            j++;
+        }else if( s_1[i] != '?'
+               && s_1[i] != '*'){
+            r = "false";
+        }else{
+            if (s_1[i] == '?'){
+                if(!isalpha(s_2[j]) && !isdigit(s_2[j])){
+                    r = "false";
+                }else{
+                    i++;
+                    j++;
+                }
+            }else if (s_1[i] == '*'){
+                if (i < s_1.size()-1){
+
+                    char right = s_1[i+1];//找到星号下一个
+                    int m = j;
+                    for (int k = j; k < s_2.size(); ++k) {
+                        if (right == s_2[k]){
+                            m =k;
+                            break;
+                        }
+                    }
+                    if (m == j) {//没有找到
+                        r = "false";
+                        break;
+                    }else{
+                        i++;
+                        j = m;
+                    }
+                }else{//最后一个 且为*
+                    int q = j;
+                    for (; q < s_2.size(); ++q) {
+                        if (!isdigit(s_2[q]) && !isalpha(s_2[q])){
+                            r = "false";
+                            break;
+                        }
+                    }
+                    j = q;
+                    i++;j++;
+                }
+            }
+        }
+
+    }
+    if (i < s_1.size() || j < s_2.size()){
+        r = "false";
+    }
+    cout<<r<<endl;
+}
+void HJ74(){
+    string order = "xcopy /s \"C:\\\\program files\" \"d:\\\"";
+    // xcopy /s c:\\ d:\\e
+    // xcopy /s "C:\\program files" "d:\"
+    vector<string> vec;
+    bool havaLeft = false;
+    int i = 0;
+    int j = 0;
+    while ( j < order.length()){
+        char c_i = order[i];
+        char c_j = order[j];
+        if (isspace(order[j])){
+
+            if (havaLeft){//有左引号
+                j++;
+            }else{//没有左引号
+                vec.push_back(order.substr(i,j-i));
+                j++;
+                i = j;
+            }
+        }else if(j == order.size()-1){
+            if (order[j] == '"'){
+                vec.push_back(order.substr(i,j-i));
+            }else{
+                vec.push_back(order.substr(i,j-i+1));
+            }
+
+            j++;
+        }else if(order[j] == '"'){
+            // xcopy /s "C:\\program files" "d:\"
+            if (havaLeft){
+                vec.push_back(order.substr(i,j-i));
+                j += 2;
+                i = j;
+                havaLeft = false;
+            }else{
+                havaLeft = true;
+                i++;
+                j++;
+            }
+        }else{//既不是空格，也不是引号
+            j++;
+        }
+    }
+    cout<<vec.size()<<endl;
+    for (auto item : vec) {
+        cout<<item<<endl;
+    }
+}
+
+stack<int> stack_wash(stack<int> b,stack<int> s,stack<int> a){
+    if (!s.empty()) s.push(a.top());
+    stack<int> out = b;
+    out.push(s.top());
+
+}
+
+void HJ77(){
+    int n = 3;
+    stack<int> b;
+    stack<int> s;
+    stack<int> a;
+    for (int i = 3; i>0; i--) {
+        b.push(i);
+    }
+
+}
+
+bool isDigit(string str){
+   bool r = true;
+   for(char c : str){
+       if (!isdigit(c)){
+           r = false;
+           break;
+       }
+   }
+    return r;
+
+}
+
+void HJ90(){
+    string ip = "+1.2.3.8";
+    vector<string> vec;
+    istringstream iss(ip);
+    string token;
+    bool b = true;
+    while (getline(iss,token,'.')){
+        if (token == ""){
+            cout<<"NO";
+            return;
+        }
+        vec.push_back(token);
+    }
+
+
+    if (vec.size()==4){
+        for (int i = 0; i < vec.size(); ++i) {
+            if (vec[i][0] == '0' && vec[i].length()>1){
+                b = false;
+                break;
+            }
+            if (!isDigit(vec[i]) || (::atoi(vec[i].c_str())>255 || ::atoi(vec[i].c_str())<0)){
+                b = false;
+                break;
+            }
+        }
+    }else{
+        b = false;
+    }
+    if (b){
+        cout<<"YES"<<endl;
+    }else{
+        cout<<"NO"<<endl;
+    }
+
+}
+void HJ92(){
+    string str = "a8a72a6a5yy98y65ee1r2";
+    int i = 0;
+    int j = 0;
+    vector<string> vec;
+    while (j < str.length()){
+        char c_i = str[i];
+        char c_j = str[j];
+        if (!isdigit(c_i) && !isdigit(c_j)){
+            i++;
+            j++;
+        }else if (isdigit(c_i) && isdigit(c_j) && j != str.length()-1){
+            j++;
+        }else if ((isdigit(str[i]) && !isdigit(str[j]))
+                 || (isdigit(str[i]) && j == str.length()-1 )){
+            string digitString = "";
+            if(j == str.length()-1){
+                digitString = str.substr(i,j-i+1);
+            }else{
+                digitString = str.substr(i,j-i);
+            }
+            if (vec.empty()){
+                vec.push_back(digitString);
+            }else{
+                if (digitString.length() > vec[0].length()){
+                    vec.clear();
+                    vec.push_back(digitString);
+                }else if(digitString.length() == vec[0].length()){
+                    vec.push_back(digitString);
+                }
+            }
+            j++;
+            i=j;
+        }
+    }
+    for(auto item : vec){
+        cout<<item;
+    }
+    cout<<","<<vec[0].length();
+}
+
+int getMaxSubque(vector<int> nums){
+    vector<int> dp(nums.size());//初始化为0
+    dp[0] = 1;
+    for (int i = 0; i < nums.size() ; ++i) {
+        int Max = 1;
+        for (int j = 0; j < i; ++j) {
+            if (nums[j] < nums[i]){
+                Max = max(Max,dp[j] + 1);
+            }
+        }
+        dp[i] = Max;
+    }
+    int final_max = 0;
+    for(int item : dp){
+        final_max = max(final_max,item);
+    }
+    return final_max;
+}
+
+
+void HJ103(){
+    int n = 6;
+    int Max = 1;
+    int nums[] = {2,5,1,5,4,5};
+    for (int i = 0; i < n ; ++i) {
+        vector<int>  rightNum;
+        //拷贝部分
+        for (int j = i; j < n; ++j) {
+            rightNum.push_back(nums[j]);
+        }
+        Max = max(Max,getMaxSubque(rightNum));
+    }
+    cout<<Max<<endl;
+
+}
+
+#define eps 1e-5 //精度
+void HJ107(){
+    double num,left,right,mid;
+    while(cin>>num){
+        left = min(-1.0,num);
+        right = min(1.0,num);
+        while (::fabs(right - left)>eps){
+            mid = (right + left) / 2;
+            if (mid * mid * mid <num){
+                left = mid;
+            }else{
+                right = mid;
+            }
+        }
+    }
+    ::printf("%.1f",mid);
+}
+
+void HJ66(){
+
+}
+
 int main() {
-    HJ45();
+    float n;
+    int token;
+    int number_neg = 0;
+    float sum = 0;
+    float number = 0;
+    while (cin >> n) { // 注意 while 处理多个 case
+        if (n<0) {
+            number_neg++;
+        }else{
+            number++;
+            sum += n;
+        }
+    }
+    cout<<number_neg<<endl;
+    if (number > 0 ) {
+        cout<<fixed<<setprecision(sum/number)<<endl;
+    }else{
+        cout<<fixed<<setprecision(0.0)<<endl;
+    }
+    HJ103();
 //    cout<<getBinary(6)<<endl;
 
 //    string a = "dacbb";
