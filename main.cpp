@@ -10,6 +10,8 @@
 #include<time.h>
 #include <cmath>
 #include <queue>
+#include <list>
+#include <regex>
 
 using namespace std;
 
@@ -349,69 +351,6 @@ public:
         y = b;
     }
 };
-bool dfs(vector<vector<int>> map,int x,int y,vector<position> path){
-    path.push_back(position(x,y));//添加当前坐标
-    map[x][y] = 1;//标记此点
-    //结束标志
-    if (x== map.size()-1 && y == map[0].size()-1){
-        return true;//?
-    }
-    //向下能走
-    if (x+1<map.size() && map[x+1][y] == 0){
-        if (dfs(map,x+1,y,path)){
-            return true;
-        }
-    }
-    //右
-    if (y+1 < map[0].size() && map[x][y+1] == 0){
-        if (dfs(map,x,y+1,path)){
-            return true;
-        }
-    }
-    //上
-    if (x-1 >= 0 && map[x-1][y] == 0){
-        if (dfs(map,x-1,y,path)){
-            return true;
-        }
-    }
-    //左
-    if (y-1 >= 0 && map[x][y-1] == 0){
-        if (dfs(map,x,y-1,path)){
-            return true;
-        }
-    }
-    //回溯（都不行，死路时）
-    path.pop_back();//删除尾元素
-    cout<<"pop"<<endl;
-    map[x][y] = 0;//重新置为可通
-    return false;
-
-}
-
-void HJ43_dfs(){
-    int n ;
-    int m;
-    while(cin>>n>>m){
-        vector<vector<int>> map;
-        for (int i = 0; i < n; ++i) {
-            vector<int> v;
-            for (int j = 0; j < m; ++j) {
-                int temp;
-                cin>>temp;
-                v.push_back(temp);
-            }
-            map.push_back(v);
-        }
-        vector<position> path;
-        dfs(map,0,0,path);
-        for (auto p : path) {
-            cout<<"("<<p.x<<","<<p.y<<")"<<endl;
-        }
-    }
-
-
-}
-
 
 void HJ3(){
     int n;
@@ -651,7 +590,7 @@ void HJ80(){ //整型数组合并
     }
 }
 
-void HJ83(){//字符串匹配
+void HJ81(){//字符串匹配
     string str_s;
     string str_b;
     while(cin>>str_s>>str_b){
@@ -1374,27 +1313,6 @@ void HJ38(){
     cout<<h_5<<endl;
 }
 
-void HJ41(){
-    //暴力算法
-    int n = 2;
-    vector<int> w = {1,2};
-    vector<int> num = {2,1};
-    vector<vector<int>> weights;
-    for (int i = 0; i < w.size(); ++i) {
-        vector<int> temp;
-        for (int j = 0; j <= num[i]; ++j) {
-            temp.push_back(w[i]*j);
-        }
-        weights.push_back(temp);
-    }
-    set<int> s;
-    for (int i = 0; i < weights.size(); ++i) {
-        for (int j = 0; j < weights[i].size(); ++j) {
-//            s.insert(weights)
-        }
-    }
-    cout<<endl;
-}
 
 typedef pair<char, int> PAIR;
 
@@ -1430,10 +1348,6 @@ void HJ45(){
     cout<<sum<<endl;
 }
 
-class list{
-public:
-
-};
 
 void HJ37(){
     int n = 7;
@@ -1462,9 +1376,7 @@ void HJ37(){
 void HJ48(){
 
 }
-void HJ50(){
 
-}
 
 bool contain_7(int number){
     string str =  to_string(number);
@@ -1654,15 +1566,7 @@ void HJ64(){
 
 }
 
-void HJ65(){
-    string str_1 = "abcdefghijklmnop";
-    string str_2 = "abcsafjklmnopqrstuvw";
-    string sub = "";
-    for (int i = 0; i < str_1.size(); ++i) {
-        int index = str_2.find_first_of(str_2[i]);
-        cout<<index;
-    }
-}
+
 bool isSame_ad(char a,char b){
     if (isdigit(a) && isdigit(b)){
         return a == b;
@@ -1784,23 +1688,6 @@ void HJ74(){
     }
 }
 
-stack<int> stack_wash(stack<int> b,stack<int> s,stack<int> a){
-    if (!s.empty()) s.push(a.top());
-    stack<int> out = b;
-    out.push(s.top());
-
-}
-
-void HJ77(){
-    int n = 3;
-    stack<int> b;
-    stack<int> s;
-    stack<int> a;
-    for (int i = 3; i>0; i--) {
-        b.push(i);
-    }
-
-}
 
 bool isDigit(string str){
    bool r = true;
@@ -1945,31 +1832,675 @@ void HJ107(){
     ::printf("%.1f",mid);
 }
 
+bool stringCompare(string str1,string str2){
+    if (str2.find(str1)==0){
+        return true;
+    }
+    return false;
+}
+
+
 void HJ66(){
+    string order = "reb";
+    vector<pair<string,string>> order_list = {
+                                            make_pair("reset","board"),
+                                            make_pair("board","add"),
+                                            make_pair("board ","delete"),
+                                            make_pair("reboot ","backplane"),
+                                            make_pair("backplane  ","abort")};
+    vector<string> exe = {"board fault","where to add","no board at all",
+                        "impossible","install first"};
+
+    vector<string> order_anal;
+    //分析命令串
+    istringstream iss(order);
+    string token;
+    while (getline(iss,token,' ')){
+        order_anal.push_back(token);
+    }
+
+    string result = "";
+    bool macth = false;
+    if (order_anal.size()==1){//先判断一个词的情况
+        if(stringCompare(order_anal[0],"reset")){
+            result = "reset what";
+        }else{
+            result = "unknown command";
+        }
+    }else if(order_anal.size() > 2){
+        result = "unknown command";
+    }else{
+        int i = 0;
+        int j = 0;
+        int targetPos = -1;
+        while (j < order_list.size()){
+            string order_i_first = order_anal[0];
+            string order_i_second = order_anal[1];
+            string order_j_first = order_list[j].first;
+            string order_j_second = order_list[j].second;
+            //逐步比较
+            if (stringCompare(order_i_first,order_j_first)
+                && stringCompare(order_i_second,order_j_second) ) {//比较成功
+                if (!macth){
+                    macth = true;
+                    result = exe[j];
+                }else{
+                    result = "unknown command";
+                    break;
+                }
+            }else{
+                if(!macth){
+                    result = "unknown command";
+
+                }
+            }
+            j++;
+        }
+
+    }
+    cout<<result<<endl;
+
+}
+int row_plus_column(vector<int> row,vector<int> column){
+    int sum = 0;
+    for (int i = 0; i < row.size(); ++i) {
+        sum += row[i]*column[i];
+    }
+    return sum;
+}
+void HJ69(){
+    int x = 2;
+    int y = 3;
+    int z = 2;
+
+//    vector<vector<int>> matrix_A={{1,2,3},
+//                                  {3,2,1}};
+//    vector<vector<int>> matrix_B={{1,2},
+//                                  {2,1},
+//                                  {3,3}};
+
+    while(cin>>x>>y>>z){
+        vector<vector<int>> matrix_A(x,vector<int>(y));
+        vector<vector<int>> matrix_B(y,vector<int>(z));
+//结果矩阵
+        vector<vector<int>> matrix_result(x,vector<int>(z));
+        //接收数据形成数组
+        //A
+        for (int i = 0; i < x; ++i) {
+            for (int j = 0; j < y; ++j) {
+                int item;
+                cin>>item;
+                matrix_A[i][j] = item;
+            }
+        }
+        //B
+        for (int i = 0; i < y; ++i) {
+            for (int j = 0; j < z; ++j) {
+                int item;
+                cin>>item;
+                matrix_B[i][j] = item;
+            }
+        }
+        //旋转B矩阵
+        vector<vector<int>> matrix_rotate_B(matrix_B[0].size(),vector<int>(matrix_B.size()));
+        for (int i = 0; i < matrix_B[0].size(); ++i) {
+            for (int j = 0; j < matrix_B.size(); ++j) {
+                int item = matrix_B[j][i];
+                matrix_rotate_B[i][j] = item;
+            }
+        }
+        for (int i = 0; i < x; ++i) {
+            for (int j = 0; j < z; ++j) {
+                matrix_result[i][j] = row_plus_column(matrix_A[i],matrix_rotate_B[j]);
+            }
+        }
+        for (int i = 0; i < x; ++i) {
+            for (int j = 0; j < z; ++j) {
+                cout<<matrix_result[i][j];
+                if (j != z-1){
+                    cout<<" ";
+                }
+            }
+            cout<<endl;
+        }
+    }
 
 }
 
-int main() {
-    float n;
-    int token;
-    int number_neg = 0;
-    float sum = 0;
-    float number = 0;
-    while (cin >> n) { // 注意 while 处理多个 case
-        if (n<0) {
-            number_neg++;
-        }else{
-            number++;
-            sum += n;
+void getEgy(int a,int b){
+    if (a==1){
+        cout<<1<<"/"<<b<<endl;
+        return;
+    }
+    if (b%a == 0){
+        cout<<1<<"/"<<b/a<<endl;
+        return;
+    }
+    cout<<1<<"/"<<b/a + 1 <<"+";
+    getEgy(a- b%a,b*(b/a+1));
+
+}
+
+void HJ82(){
+    char ch;
+    int a;
+    int b;
+    while (cin>>a>>ch>>b){
+        getEgy(a,b);
+    }
+}
+
+void HJ41_dp(){
+    int n;
+    while (cin>>n){
+        vector<int> weight(n);
+        vector<int> num(n);
+        int sum = 0;
+        for (int i = 0; i < n; ++i) {
+            cin>>weight[i];
+        }
+        for (int i = 0; i < n; ++i) {
+            cin>>num[i];
+            sum += num[i]*weight[i];
+        }
+        vector<bool> dp(sum + 1,false);
+        dp[0] = true;
+        for (int i = 0; i < n; ++i) {//按重量循环
+            for (int j = 0; j < num[i]; ++j) {//每个重量的个数循环
+                for (int k = sum; k >= weight[i]; --k) {
+                    if (dp[k-weight[i]]){
+                        dp[k] = true;
+                    }
+                }
+            }
+        }
+        int count = 0;
+        for(auto b : dp){
+            if (b) count++;
+        }
+        cout<<count<<endl;
+    }
+}
+
+void HJ41_set(){
+    int n;
+    while (cin>>n){
+        int count = 0;
+        vector<int> weight(n);
+        vector<int> num(n);
+        for (int i = 0; i < n; ++i) {
+            cin>>weight[i];
+        }
+        for (int i = 0; i < n; ++i) {
+            cin>>num[i];
+            count += num[i];
+        }
+        vector<int> n_weight(count);
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < num[i]; ++j) {
+                n_weight.push_back(weight[i]);
+            }
+        }
+        set<int> s;
+        s.insert(0);
+        for (int i = 0; i < n_weight.size(); ++i) {
+            set<int> tmp(s);
+            for(auto it = tmp.begin();it != tmp.end();it++){
+                s.insert(*it + n_weight[i]);
+            }
+        }
+        cout<<s.size()<<endl;
+    }
+}
+
+int m = 5;
+int n = 5;
+vector<vector<int>> maze ={{0,1,0,0,0},
+                          {0,1,1,1,0},
+                          {0,0,0,0,0},
+                          {0,1,1,1,0},
+                          {0,0,0,1,0}};
+
+vector<pair<int,int>> temp_path;
+vector<pair<int,int>> final_path;
+
+void dfs(int x,int y){
+    if (x < 0 || x >= n || y<0 || y >= m || maze[x][y] == 1){
+        return;
+    }
+    maze[x][y] = 1;//标记走过的地点为1，视为墙
+    temp_path.push_back(make_pair(x,y));
+    if (x == n-1 && y == m-1){
+        final_path = temp_path;
+    }
+    dfs(x-1,y);
+    dfs(x+1,y);
+    dfs(x,y-1);
+    dfs(x,y+1);
+    maze[x][y] = 0;
+    temp_path.pop_back();
+}
+
+
+void HJ43_dfs(){
+    while (cin>>n>>m){
+        maze = vector<vector<int>>(n,vector<int>(m,0));
+        final_path.clear();
+        temp_path.clear();
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                cin>>maze[i][j];
+            }
+        }
+        dfs(0,0);
+        for (int i = 0; i < final_path.size(); ++i) {
+            cout<<"("<<final_path[i].first<<","<<final_path[i].second<<")"<<endl;
         }
     }
-    cout<<number_neg<<endl;
-    if (number > 0 ) {
-        cout<<fixed<<setprecision(sum/number)<<endl;
-    }else{
-        cout<<fixed<<setprecision(0.0)<<endl;
+}
+
+void compute(stack<int>& st1,stack<char>& st2){//计算
+    int b = st1.top();
+    st1.pop();
+    int a = st1.top();
+    st1.pop();
+    char op = st2.top();
+    st2.pop();
+    if (op == '+') a = a + b;
+    else if (op == '-') a = a - b;
+    else if (op == '*') a = a*b;
+    else if (op == '/') a = a/b;
+    st1.push(a);
+}
+bool priority(char m,char n){//n是否比m优先级高
+    if (m == '('){
+        return false;
+    }else if ((m=='+' || m == '-') && (n == '*' || n == '/')){
+        return false;
     }
-    HJ103();
+    return true;
+}
+
+void HJ50(){ //四则运算
+    string expression = "3+2*{1+2*[-4/(8-6)+7]}";
+    stack<int> number;
+    stack<char> op;
+    op.push('(');
+    expression += ')';
+    bool flag = false;//运算符的标志，不能用字符简单判断，因为有正负号
+
+    for (int i = 0; i < expression.length(); ++i) {
+        if (expression[i]=='(' ||expression[i]=='[' || expression[i]=='{'){//左括号 入栈
+            op.push('(');
+        }else if (expression[i]==')' ||expression[i]==']' || expression[i]=='}'){
+            //右括号
+            while (op.top() != '('){//不断弹出计算，直到遇到左括号
+                compute(number,op);
+            }
+            op.pop();//弹出左括号
+        }else if (flag){ //运算符
+            while (priority(op.top(),expression[i])){
+                compute(number,op);
+            }
+            op.push(expression[i]);
+            flag = false;
+        }else{//数字
+            int j = i;//记录数字的起始
+            if (expression[j] == '-' || expression[j] == '+'){
+                i++;
+            }
+            while (isdigit(expression[i])){
+                i++;
+            }
+            string temp = expression.substr(j,i-j);
+            number.push(stoi(temp));
+            i--;
+            flag = true;
+        }
+    }
+    cout<<number.top();
+
+}
+
+void showTwoVector(vector<vector<int>> vec){
+    for (int i = 0; i < vec.size(); ++i) {
+        for (int j = 0; j < vec[0].size(); ++j) {
+            cout<<vec[i][j]<<endl;
+        }
+        cout<<endl;
+    }
+}
+
+void HJ53(){
+    int n;
+    vector<int> vec = {2,3,2,4};
+    while (cin>>n){
+        if (n<=2) cout<<-1;
+        else cout<<vec[(n+1)%4];
+    }
+}
+vector<double> nums = {7,2,1,10};
+vector<int> visit = {0,0,0,0};
+bool resul_num = false;
+bool dfs_num(vector<double> nums, double result){
+    if(nums.empty()){
+        return result == 24;
+    }
+    for (int i = 0; i < nums.size(); ++i) {
+        vector<double> rest;
+        rest.erase(rest.begin()+i);
+        if (dfs_num(rest,result + nums[i])
+          ||dfs_num(rest,result - nums[i])
+          ||dfs_num(rest,result * nums[i])
+          ||dfs_num(rest,result / nums[i])){
+            return true;
+        }
+    }
+    return false;
+}
+
+void HJ67(){
+    vector<double> nums(4);
+    while (cin>>nums[0]>>nums[1]>>nums[2]>>nums[3]){
+        if (dfs_num(nums,0)){
+            cout<<"true";
+        }else{
+            cout<<"false";
+        }
+    }
+}
+
+void HJ65(){//最长公共字串
+    string a = "abcdefghijklmnop";
+    string b = "abcsafjklmnopqrstuvw";
+    vector<vector<int>> dp(310,vector<int>(310,0));
+    int maxx = 0;
+    int pos = 0;
+    
+    //初始化第一行和第一列
+    for (int i = 0; i < a.size(); ++i) {
+        if (a[i] == b[0]) dp[i][0] =1,maxx = 1,pos = i;
+        else dp[i][0] = 0;
+    }
+    for (int i = 0; i < b.size(); ++i) {
+        if (b[i] == a[0]) dp[0][i] = 1, maxx = 1,pos=i;
+        else dp[0][i] = 0;
+    }
+    for (int i = 1; i < a.size(); ++i) {
+        for (int j = 1; j < b.size(); ++j) {
+            if (a[i] == b[j]){
+                dp[i][j] = dp[i-1][j-1] +1;
+                if (dp[i][j] > maxx){
+                    maxx = dp[i][j];
+                    pos = i;
+                }
+            }else{
+                dp[i][j] = 0;
+            }
+        }
+    }
+    cout<<a.substr(pos - maxx + 1, maxx)<<endl;
+
+}
+
+void HJ70(){
+    int n = 3;
+    vector<pair<int,int>> matrix;
+    int result = 0;
+    matrix.push_back(make_pair(50,10));
+    matrix.push_back(make_pair(10,20));
+    matrix.push_back(make_pair(20,5));
+    string order = "(A(BC))";
+    stack<pair<int,int>> s ;
+    for (int i = 0; i < order.size(); ++i) {
+        if (order[i] == ')'){
+            pair<int,int> right = s.top();
+            s.pop();
+            pair<int,int> left = s.top();
+            s.pop();
+            //计算所需步骤
+            result += left.second * left.first * right.second;
+            //新矩阵入栈
+            s.push(make_pair(left.first,right.second));
+        }else if(order[i] == '('){
+            continue;
+        }else{
+            s.push(matrix[order[i] - 65]);
+        }
+    }
+
+    cout<<result<<endl;
+}
+bool isleg(int n){
+    if (0<=n && n<=9){
+        return true;
+    }else{
+        return false;
+    }
+}
+void HJ83(){
+    int m = 4;
+    int n = 9;
+    while (cin>>m>>n){
+        if (0 <= m && m <= 9 && 0 <= n && n <= 9){
+            cout<<0<<endl;//初始化成功
+        }else{
+            cout<<-1<<endl;
+        }
+        int x1,x2,y1,y2;
+        cin>>x1>>y1>>x2>>y2;
+        //判断交换坐标
+        if (0 <= x1 && x1 < m && 0 <= y1 && y1 < n  &&
+            0 <= x2 && x2 < m && 0 <= y2 && y2 < n){
+            cout<<0<<endl;
+        }else{
+            cout<<-1<<endl;
+        }
+        //判断插入行
+        int x;
+        cin>>x;
+        if ( 0 <= x && x < m && m+1 <= 9){
+            cout<<0<<endl;
+        }else{
+            cout<<-1<<endl;
+        }
+        int y;
+        cin>>y;
+        if (0 <= y && y < n && n+1 <= 9){
+            cout<<0<<endl;
+        }else{
+            cout<<-1<<endl;
+        }
+        cin>>x>>y;
+        if (0 <= x && x < m && 0 <= y && y < n){
+            cout<<0<<endl;
+        }else{
+            cout<<-1<<endl;
+        }
+    }
+}
+bool check_stack(vector<int> vec,vector<int> A){
+    stack<int> s_temp;
+    int j = 0;
+    for (int i = 0; i < A.size(); ++i) {
+        s_temp.push(A[i]);
+        while (!s_temp.empty() && s_temp.top() == vec[j]){
+            s_temp.pop();
+            j++;
+        }
+    }
+    return s_temp.empty();
+
+}
+void HJ77_permutation(){
+    int n = 3;
+    vector<int> trains(n);
+    vector<int> back(n);
+    for (int i = 0; i < n; ++i) {
+        cin>>trains[i];
+        back[i] = trains[i];
+    }
+    sort(trains.begin(),trains.end());
+    do {
+        if (check_stack(trains,back)){
+            for (int i = 0; i < trains.size(); ++i) {
+                cout<<trains[i]<<" ";
+            }
+            cout<<endl;
+        }else{
+            for (int i = 0; i < trains.size(); ++i) {
+                cout<<trains[i];
+            }
+            cout<<"don't exist"<<endl;
+        }
+    } while (next_permutation(trains.begin(),trains.end()));
+}
+void dfs_train(const vector<int>& in, int index, stack<int>& st, vector<int>& out, vector<vector<int>>& res){
+    if (index >= in.size() && st.empty()){
+        res.push_back(out);
+        return;
+    }
+    if (index < in.size()){
+        st.push(in[index]);
+        dfs_train(in, index + 1, st, out, res);
+        st.pop();
+    }
+    if (!st.empty()){
+        out.push_back(st.top());
+        st.pop();
+        dfs_train(in, index, st, out, res);
+        st.push(out.back());
+        out.pop_back();
+    }
+}
+void HJ77_dfs(){
+    int n = 3;
+    vector<int> nums(n);
+    nums[0] = 1;
+    nums[1] = 2;
+    nums[2] = 3;
+    stack<int> st;
+    vector<int> path;
+    vector<vector<int>> res;
+    dfs_train(nums, 0, st, path, res);
+    sort(res.begin(), res.end());
+    for (auto p : res) {
+        for(int item : p) {
+            cout<<item<<" ";
+        }
+        cout<<endl;
+    }
+}
+
+long long int dec2bin(vector<long long int> vec){
+    long long int num = 0;
+    num = (vec[0]<<24)+(vec[1]<<16)+(vec[2]<<8)+(vec[3]);
+    return num;
+}
+string dec2binStr(long long int n){
+    string res = "";
+    stack<int> s;
+    while (n != 0){
+        s.push(n%2);
+        n /= 2;
+    }
+    while (!s.empty()){
+        res += to_string(s.top());
+        s.pop();
+    }
+    if (res.length() < 8){
+        string head(8 - res.length(),'0');
+        res = head + res;
+    }
+    return res;
+}
+bool is_legal_mask(vector<long long int> vec){
+    string mask = "";
+    for (int i = 4; i < 8; ++i) {
+        mask += dec2binStr(vec[i]);
+    }
+    regex r("1{1,31}0{1,31}");
+    return regex_match(mask,r);
+}
+bool is_legal_ip(vector<long long int> vec){
+    for (int i = 0; i < 4; ++i) {
+        if(0 > vec[i] || vec[i] > 255 ){
+            return false;
+        }
+    }
+    return true;
+}
+int num_A = 0;
+int num_B = 0;
+int num_C = 0;
+int num_D = 0;
+int num_E = 0;
+int num_illegal = 0;
+int num_private = 0;
+void HJ18(){
+    vector<long long int> vec_A_start = {1,0,0,0};
+    vector<long long int> vec_B_start = {128,0,0,0};
+    vector<long long int> vec_C_start = {192,0,0,0};
+    vector<long long int> vec_D_start = {224,0,0,0};
+    vector<long long int> vec_E_start = {240,0,0,0};
+    vector<long long int> vec_A_end = {126,255,255,255};
+    vector<long long int> vec_B_end = {191,255,255,255};
+    vector<long long int> vec_C_end = {223,255,255,255};
+    vector<long long int> vec_D_end = {239,255,255,255};
+    vector<long long int> vec_E_end = {255,255,255,255};
+    vector<long long int> vec_private_1_start = {10,0,0,0};
+    vector<long long int> vec_private_1_end = {10,255,255,255};
+    vector<long long int> vec_private_2_start = {172,16,0,0};
+    vector<long long int> vec_private_2_end = {172,31,255,255};
+    vector<long long int> vec_private_3_start = {192,168,0,0};
+    vector<long long int> vec_private_3_end = {192,168,255,255};
+
+
+
+    string str = "1.0.0.1~255.0.0.0"; //3232235522
+    while (getline(cin,str)){
+        vector<long long int> nums;
+        smatch match_result;
+        regex r("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})~(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");//正则表达式验证是否合法
+        if (regex_match(str,match_result,r)){
+            for(auto it = match_result.begin()+1;it != match_result.end();++it){
+                nums.push_back(stoi(*it));
+            }
+            if (is_legal_ip(nums) && is_legal_mask(nums)){
+//                cout<<"legal"<<endl;
+                if (dec2bin(vec_A_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_A_end)){
+                    num_A++;
+                }else if(dec2bin(vec_B_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_B_end)){
+                    num_B++;
+                }else if(dec2bin(vec_C_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_C_end)){
+                    num_C++;
+                }else if(dec2bin(vec_D_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_D_end)){
+                    num_D++;
+                }else if(dec2bin(vec_E_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_E_end)){
+                    num_E++;
+                }
+                if (dec2bin(vec_private_1_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_private_1_end)){
+                    num_private++;
+                }else if(dec2bin(vec_private_2_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_private_2_end)){
+                    num_private++;
+                }else if(dec2bin(vec_private_3_start) <= dec2bin(nums) && dec2bin(nums) <= dec2bin(vec_private_3_end)){
+                    num_private++;
+                }
+            }else{
+                num_illegal++;
+            }
+        }else{
+//            cout<<"illegal ip"<<endl;
+            num_illegal++;
+        }
+    }
+    cout<<num_A<<" "<<num_B<<" "<<num_C<<" "<<num_D<<" "<<num_E<<" "<<num_illegal<<" "<<num_private<<endl;
+
+}
+int main() {
+    HJ18();
+
+//    cout<<str2.find(str1);
 //    cout<<getBinary(6)<<endl;
 
 //    string a = "dacbb";
@@ -1988,7 +2519,7 @@ int main() {
 //    clock_t s,e;
 //    s=clock();
 //    //---------------------------------------
-//    myBag();
+//    HJ53();
 //    //---------------------------------------
 //    e=clock();
 //    cout<<"T="<<(double(e-s)/CLOCKS_PER_SEC)<<"s\n";
